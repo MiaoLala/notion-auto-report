@@ -4,7 +4,7 @@ from notion_client import Client
 
 # 初始化 Notion API 客戶端
 notion = Client(auth=os.environ["NOTION_TOKEN"])
-database_id = os.environ["NOTION_DATABASE_ID"]
+database_id = "2182a91a-405d-80fe-82eb-c3bf47bfe625"
 
 if not database_id:
     print(f"❌ 找不到資料庫：「{database_name}」")
