@@ -1,2 +1,28 @@
+name: 手動執行 Notion 報告腳本
+
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # 允許從 GitHub UI 手動觸發
+
+jobs:
+  run-notion-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 取得專案程式碼
+        uses: actions/checkout@v3
+
+      - name: 安裝 Python 環境
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'  # 可改為 3.11 等版本
+
+      - name: 安裝套件
+        run: |
+          pip install -r requirements.txt
+
+      - name: 執行 Notion 腳本
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+        run: |
+          python main.py
