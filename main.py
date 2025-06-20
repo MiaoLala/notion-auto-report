@@ -8,7 +8,7 @@ notion = Client(auth=os.environ["NOTION_TOKEN"])
 database_id = "2182a91a-405d-80fe-82eb-c3bf47bfe625"
 
 # LINE Messaging API Token & userId
-LINE_ACCESS_TOKEN = os.environ["LINE_CHANNEL_SECRET"]
+LINE_ACCESS_TOKEN = os.environ["LINE_ACCESS_TOKEN"]
 LINE_USER_ID = "miaolala_" # os.environ["LINE_USER_ID"]  # 你要發訊息的對象（自己或用戶）
 
 def send_line_message(user_id, message):
