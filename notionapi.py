@@ -21,7 +21,7 @@ notion.pages.create(
             "title": [
                 {
                     "text": {
-                        "content": today
+                        "content": today + "測試API"
                     }
                 }
             ]
