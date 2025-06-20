@@ -44,7 +44,8 @@ if not miao_user_id:
     exit(1)
 
 # === 2. 建立 Notion 資料 ===
-today = datetime.now().strftime("%Y-%m-%d")
+# today = datetime.now().strftime("%Y-%m-%d")
+today = datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y-%m-%d")
 new_page = notion.pages.create(
     parent={"database_id": database_id},
     properties={
