@@ -4,21 +4,7 @@ from notion_client import Client
 
 # 初始化 Notion API 客戶端
 notion = Client(auth=os.environ["NOTION_TOKEN"])
-
-# 用來尋找資料庫 ID
-def find_database_id_by_name(name):
-    results = notion.search(filter={"property": "object", "value": "database"})
-    for result in results.get("results", []):
-        title_prop = result.get("title", [])
-        if title_prop:
-            db_title = title_prop[0]["plain_text"]
-            if db_title == name:
-                return result["id"]
-    return None
-
-# 取得資料庫 ID（名稱：測試）
-database_name = "測試"
-database_id = find_database_id_by_name(database_name)
+database_id = os.environ["NOTION_DATABASE_ID"]
 
 if not database_id:
     print(f"❌ 找不到資料庫：「{database_name}」")
