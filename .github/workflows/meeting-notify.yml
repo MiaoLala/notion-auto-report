@@ -4,6 +4,8 @@ on:
   schedule:
     - cron: '0 0 * * *'  # UTC 時間 00:00 -> 台灣 08:00
   workflow_dispatch:     # 手動執行也可以
+  repository_dispatch:
+    types: [meeting-check]
 
 jobs:
   notify-miao:
