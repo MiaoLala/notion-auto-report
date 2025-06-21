@@ -2,6 +2,8 @@ name: 手動執行 Notion 報告腳本222
 
 on:
   workflow_dispatch:  # 允許從 GitHub UI 手動觸發
+  repository_dispatch:
+    types: [notion-button]
 
 jobs:
   run-notion-script:
