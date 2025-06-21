@@ -49,22 +49,19 @@ if not systems:
 grouped = {}
 
 for system_name in systems:
-    # 假設命名都是 EBS－XXX
     if "－" in system_name:
-        main, sub = system_name.split("－", 1)
+        main = system_name.split("－", 1)[0]
     else:
-        main, sub = "其他", system_name
-    grouped.setdefault(main, {}).setdefault(sub, []).extend(systems[system_name])
+        main = system_name
+    grouped.setdefault(main, []).extend(systems[system_name])
 
 # 排版內容
 content_lines = []
 for main in grouped:
     content_lines.append(f"【{main}】")
-    for sub in grouped[main]:
-        content_lines.append(sub)
-        for idx, item in enumerate(grouped[main][sub], 1):
-            content_lines.append(f"{idx}. {item}")
-        content_lines.append("")  # 分隔空行
+    for idx, item in enumerate(grouped[main], 1):
+        content_lines.append(f"{idx}. {item}")
+    content_lines.append("")
 
 bulletin_text = "\n".join(content_lines)
 
