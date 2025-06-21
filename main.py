@@ -1,82 +1,93 @@
 import os
-import requests
 from datetime import datetime
 from notion_client import Client
-import pytz
 
-# === 初始化 ===
+# 初始化 Notion
 notion = Client(auth=os.environ["NOTION_TOKEN"])
-database_id = "2182a91a-405d-80fe-82eb-c3bf47bfe625"
-LINE_ACCESS_TOKEN = os.environ["LINE_ACCESS_TOKEN"]
-LINE_USER_IDS = ["Ueac062fbefdeffa4bc3a4020db58fff6"]
 
-# === LINE 發送封裝 ===
-def send_line_message(user_ids, message):
-    url = "https://api.line.me/v2/bot/message/push"
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {LINE_ACCESS_TOKEN}"
-    }
-    for user_id in user_ids:
-        data = {
-            "to": user_id,
-            "messages": [{
-                "type": "text",
-                "text": message
-            }]
-        }
-        response = requests.post(url, headers=headers, json=data)
-        if response.status_code != 200:
-            print(f"❌ 傳送給 {user_id} 失敗：{response.status_code}, {response.text}")
-        else:
-            print(f"✅ 傳送給 {user_id} 成功！")
+# 設定資料庫 ID（請替換成你的）
+UPDATE_DB_ID = "你的更新說明資料庫 ID"
+BULLETIN_DB_ID = "你的更新佈告資料庫 ID"
 
-# === 1. 找出 Miao 的 Notion user_id ===
-def get_user_id_by_name(target_name):
-    users = notion.users.list()
-    for user in users["results"]:
-        if user.get("name") == target_name:
-            return user["id"]
-    return None
+# 今日日期
+today_str = datetime.now().strftime("%Y-%m-%d")
 
-miao_user_id = get_user_id_by_name("Miao")
-if not miao_user_id:
-    print("❌ 找不到使用者 Miao")
-    exit(1)
-
-# === 2. 建立 Notion 資料 ===
-tz = pytz.timezone("Asia/Taipei")
-today = datetime.now(tz).strftime("%Y-%m-%d")
-new_page = notion.pages.create(
-    parent={"database_id": database_id},
-    properties={
-        "日期": {
-            "title": [{
-                "text": {
-                    "content": today + " 會議紀錄"
-                }
-            }]
-        },
-        "時間": {
-            "date": {
-                "start": today
-            }
-        },
-        "與會人": {
-            "people": [
-                {"id": miao_user_id}
-                # 你可以加更多與會人
-            ]
+# 查詢尚未完成的項目
+response = notion.databases.query(
+    **{
+        "database_id": UPDATE_DB_ID,
+        "filter": {
+            "property": "完成",
+            "checkbox": {"equals": False}
         }
     }
 )
 
-# === 3. 判斷與會人是否包含 Miao，發送通知 ===
-attendees = new_page["properties"]["與會人"]["people"]
-attendee_ids = [p["id"] for p in attendees]
+# 整理系統與更新內容
+systems = {}  # ex: {"團體系統": ["修正錯誤", "新增功能"]}
 
-if miao_user_id in attendee_ids:
-    msg = f"📅 會議提醒：Miao 您今日有會議（{today}），請準時參與。"
-    send_line_message(LINE_USER_IDS, msg)
-else:
-    print("⚠️ Miao 不在與會人中，略過通知")
+for row in response["results"]:
+    title = row["properties"]["更新說明"]["title"][0]["text"]["content"]
+    system_rels = row["properties"]["系統"]["relation"]
+
+    for sys in system_rels:
+        system_page = notion.pages.retrieve(sys["id"])
+        system_name = system_page["properties"]["名稱"]["title"][0]["text"]["content"]
+        # 將子系統歸入 EBS 分類（若有多平台可擴充）
+        systems.setdefault(system_name, []).append(title)
+
+# 若沒有任何未完成項目就不新增公告
+if not systems:
+    print("✅ 沒有未完成項目，不需新增佈告。")
+    exit()
+
+# 整理成公告格式
+grouped = {}
+
+for system_name in systems:
+    # 假設命名都是 EBS－XXX
+    if "－" in system_name:
+        main, sub = system_name.split("－", 1)
+    else:
+        main, sub = "其他", system_name
+    grouped.setdefault(main, {}).setdefault(sub, []).extend(systems[system_name])
+
+# 排版內容
+content_lines = []
+for main in grouped:
+    content_lines.append(f"【{main}】")
+    for sub in grouped[main]:
+        content_lines.append(sub)
+        for idx, item in enumerate(grouped[main][sub], 1):
+            content_lines.append(f"{idx}. {item}")
+        content_lines.append("")  # 分隔空行
+
+bulletin_text = "\n".join(content_lines)
+
+# 建立佈告頁面
+notion.pages.create(
+    parent={"database_id": BULLETIN_DB_ID},
+    properties={
+        "標題": {
+            "title": [
+                {
+                    "text": {"content": today_str}
+                }
+            ]
+        }
+    },
+    children=[
+        {
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {
+                "rich_text": [{
+                    "type": "text",
+                    "text": {"content": bulletin_text}
+                }]
+            }
+        }
+    ]
+)
+
+print("✅ 成功新增一則更新佈告。")
