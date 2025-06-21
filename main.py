@@ -6,11 +6,14 @@ from notion_client import Client
 notion = Client(auth=os.environ["NOTION_TOKEN"])
 
 # 設定資料庫 ID（請替換成你的）
-UPDATE_DB_ID = "你的更新說明資料庫 ID"
-BULLETIN_DB_ID = "你的更新佈告資料庫 ID"
+UPDATE_DB_ID = "2182a91a405d80fe82ebc3bf47bfe625"
+BULLETIN_DB_ID = "2192a91a405d80eeaaede0b964e6b751"
 
 # 今日日期
-today_str = datetime.now().strftime("%Y-%m-%d")
+# 取得台灣現在時間
+tz = pytz.timezone("Asia/Taipei")
+now_taipei = datetime.now(tz)
+today_str = now_taipei.strftime("%Y-%m-%d")
 
 # 查詢尚未完成的項目
 response = notion.databases.query(
