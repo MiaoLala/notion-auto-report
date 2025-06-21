@@ -50,18 +50,30 @@ grouped = {}
 
 for system_name in systems:
     if "－" in system_name:
-        main = system_name.split("－", 1)[0]
+        main, sub = system_name.split("－", 1)
     else:
-        main = system_name
-    grouped.setdefault(main, []).extend(systems[system_name])
+        main, sub = system_name, None
+
+    if main == "ＥＢＳ":
+        grouped.setdefault(main, {}).setdefault(sub, []).extend(systems[system_name])
+    else:
+        grouped.setdefault(main, []).extend(systems[system_name])
+
 
 # 排版內容
 content_lines = []
 for main in grouped:
     content_lines.append(f"【{main}】")
-    for idx, item in enumerate(grouped[main], 1):
-        content_lines.append(f"{idx}. {item}")
-    content_lines.append("")
+    if isinstance(grouped[main], dict):  # ＥＢＳ 情況：有子分類
+        for sub in grouped[main]:
+            content_lines.append(sub)
+            for idx, item in enumerate(grouped[main][sub], 1):
+                content_lines.append(f"{idx}. {item}")
+            content_lines.append("")
+    else:  # 其他系統：不顯示子分類
+        for idx, item in enumerate(grouped[main], 1):
+            content_lines.append(f"{idx}. {item}")
+        content_lines.append("")
 
 bulletin_text = "\n".join(content_lines)
 
