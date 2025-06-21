@@ -90,7 +90,7 @@ content_text = "\n".join(content_lines)
 notion.pages.create(
     parent={"database_id": ANNOUNCE_DB_ID},
     properties={
-        "更新說明": {
+        "標題": {
             "title": [{"text": {"content": f"{today} 更新佈告"}}]
         }
     },
