@@ -47,22 +47,24 @@ tz = pytz.timezone("Asia/Taipei")
 today = datetime.now(tz).strftime("%Y-%m-%d")
 
 # line 發送訊息
-def send_line_message(user_id, message):
+
+def send_line_message(message):
     url = "https://api.line.me/v2/bot/message/push"
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {LINE_ACCESS_TOKEN}"
     }
-    data = {
-        "to": user_id,
-        "messages": [{
-            "type": "text",
-            "text": message
-        }]
-    }
-    response = requests.post(url, headers=headers, json=data)
-    if response.status_code != 200:
-        print(f"LINE 發送失敗：{response.status_code} {response.text}")
+
+    for user_id in LINE_USER_IDS:
+        data = {
+            "to": user_id.strip(),
+            "messages": [{"type": "text", "text": message}]
+        }
+        response = requests.post(url, headers=headers, json=data)
+        if response.status_code != 200:
+            print(f"❌ LINE 發送失敗（{user_id}）：{response.status_code}, {response.text}")
+        else:
+            print(f"✅ 已發送給 {user_id}")
 
 # 查詢尚未完成的項目
 response = notion.databases.query(
