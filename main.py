@@ -149,7 +149,7 @@ if content_text:
 new_page = notion.pages.create(
     parent={"database_id": ANNOUNCE_DB_ID},
     properties={
-        "名稱": {
+        "標題": {
             "title": [{"text": {"content": f"{today} 更新佈告"}}]
         }
     },
