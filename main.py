@@ -67,41 +67,42 @@ for system_name in systems:
 
 # 組裝公告內容
 content_lines = []
-ec_summary_text_children = ""
-for main in grouped:
-    content_lines.append(f"【{main}】")
-    if {main} != "ＥＢＳ":
-        ec_summary_text_children += f"\n 【{main}】" # 訊息內容：站台
-    if isinstance(grouped[main], dict):  # ＥＢＳ：有子分類
-        subs = list(grouped[main].keys())
+ec_summary_lines = []  # for EC 訊息內容
+
+for main_system, system_data in grouped.items():
+    content_lines.append(f"【{main_system}】")
+
+    # 若非 EBS，記錄系統標題到 EC 區塊
+    if main_system != "ＥＢＳ":
+        ec_summary_lines.append(f"【{main_system}】")
+
+    if isinstance(system_data, dict):  # EBS 有子分類
+        subs = list(system_data.keys())
         ordered = [s for s in EBS_ORDER if s in subs]
         unordered = [s for s in subs if s not in EBS_ORDER]
+
         for sub in ordered + unordered:
             content_lines.append(sub)
-            for idx, item in enumerate(grouped[main][sub], 1):
+            for idx, item in enumerate(system_data[sub], 1):
                 content_lines.append(f"{idx}. {item}")
-            content_lines.append("")
-    else:  # 非ＥＢＳ系統
-        for idx, item in enumerate(grouped[main], 1):
+            content_lines.append("")  # 空行隔開
+    else:  # 非 EBS 系統
+        for idx, item in enumerate(system_data, 1):
             content_lines.append(f"{idx}. {item}")
-            ec_summary_text_children += f"\n {idx}. {item}" # 訊息內容：項目
+            ec_summary_lines.append(f"{idx}. {item}")
         content_lines.append("")
 
+# Notion content 組成
 content_text = "\n".join(content_lines)
 
-# ✅ 整理非ＥＢＳ（EC）系統內容
-non_ebs_grouped = {k: v for k, v in grouped.items() if k != "ＥＢＳ"}
-ec_summary_text = """12:00 壓
-13:00 放
-
-更新說明如下
---------------------------------------------"""
-
-# for system in sorted(non_ebs_grouped.keys()):
-#    if non_ebs_grouped[system]:
-#        ec_summary_text += f"\n【{system}】"
-ec_summary_text += ec_summary_text_children
-
+# EC summary block 組成
+ec_summary_text = (
+    "12:00 壓\n"
+    "13:00 放\n\n"
+    "更新說明如下\n"
+    "--------------------------------------------\n" +
+    "\n".join(ec_summary_lines)
+)
 
 # ✅ 組合 blocks 結構
 blocks = [
