@@ -20,8 +20,10 @@ notion = Client(auth=os.environ["NOTION_TOKEN"])
 
 # 設定LINE變數
 LINE_ACCESS_TOKEN = os.environ["LINE_ACCESS_TOKEN"]
-LINE_USER_ID = "Ueac062fbefdeffa4bc3a4020db58fff6"
-
+LINE_USER_IDS = [
+    "Ueac062fbefdeffa4bc3a4020db58fff6",  # 使用者
+    # 依需要可再增加
+]
 # 設定資料庫 ID
 SOURCE_DB_ID = "2182a91a405d80fe82ebc3bf47bfe625" # os.environ["SOURCE_DB_ID"]       # 更新說明的資料庫
 ANNOUNCE_DB_ID = "2192a91a405d80eeaaede0b964e6b751" # os.environ["ANNOUNCE_DB_ID"]   # 要寫入佈告的資料庫
@@ -48,23 +50,23 @@ today = datetime.now(tz).strftime("%Y-%m-%d")
 
 # line 發送訊息
 
-def send_line_message(message):
+def send_line_message(user_ids, message):
     url = "https://api.line.me/v2/bot/message/push"
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {LINE_ACCESS_TOKEN}"
     }
-
-    for user_id in LINE_USER_IDS:
+    for user_id in user_ids:
         data = {
-            "to": user_id.strip(),
-            "messages": [{"type": "text", "text": message}]
+            "to": user_id,
+            "messages": [{
+                "type": "text",
+                "text": message
+            }]
         }
         response = requests.post(url, headers=headers, json=data)
         if response.status_code != 200:
-            print(f"❌ LINE 發送失敗（{user_id}）：{response.status_code}, {response.text}")
-        else:
-            print(f"✅ 已發送給 {user_id}")
+            print(f"❌ LINE 發送失敗 → {user_id}：{response.status_code} {response.text}")
 
 # 查詢尚未完成的項目
 response = notion.databases.query(
@@ -336,4 +338,4 @@ new_page = with_retry(lambda: notion.pages.create(
 # print("✅ 成功產出更新佈告！")
 
 # ✅ 發送通知
-send_line_message(f"✅ 已產出更新佈告\n🔗 {new_page['url']}")
+send_line_message(LINE_USER_IDS, f"✅ 已產出更新佈告\n🔗 {new_page['url']}")
