@@ -84,7 +84,7 @@ for main in grouped:
     else:  # 非ＥＢＳ系統
         for idx, item in enumerate(grouped[main], 1):
             content_lines.append(f"{idx}. {item}")
-            ec_summary_text_children += f"\n {idx}. {item}"　# 訊息內容：項目
+            ec_summary_text_children += f"\n {idx}. {item}" # 訊息內容：項目
         content_lines.append("")
 
 content_text = "\n".join(content_lines)
