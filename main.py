@@ -218,7 +218,7 @@ def create_notion_announcement_page(grouped_systems):
     new_page = notion.pages.create(
         parent={"database_id": ANNOUNCE_DB_ID},
         properties={
-            "更新說明": {
+            "標題": {
                 "title": [
                     {"type": "text", "text": {"content": title}}
                 ]
