@@ -251,7 +251,7 @@ def main():
         "【B2S】"
     )
 
-    send_line_message(LINE_USER_ID, ec_line_message)
+    send_line_message(LINE_USER_IDS, ec_line_message)
 
     print("Notion 佈告頁面網址:", page["url"])
 
