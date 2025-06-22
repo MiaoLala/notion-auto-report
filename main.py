@@ -86,6 +86,78 @@ for main in grouped:
 
 content_text = "\n".join(content_lines)
 
+# ✅ 整理非ＥＢＳ（EC）系統內容
+non_ebs_grouped = {k: v for k, v in grouped.items() if k != "ＥＢＳ"}
+ec_summary_text = """12:00 壓
+13:00 放
+
+更新說明如下
+--------------------------------------------"""
+
+for system in sorted(non_ebs_grouped.keys()):
+    if non_ebs_grouped[system]:
+        ec_summary_text += f"\n【{system}】"
+
+# ✅ 組合 blocks 結構
+blocks = [
+    {
+        "object": "block",
+        "type": "heading_3",
+        "heading_3": {
+            "rich_text": [{"type": "text", "text": {"content": "ＥＣ"}}]
+        }
+    },
+    {
+        "object": "block",
+        "type": "paragraph",
+        "paragraph": {
+            "rich_text": [{"type": "text", "text": {"content": "標題（請自行修改須更新站台）"}}]
+        }
+    },
+    {
+        "object": "block",
+        "type": "code",
+        "code": {
+            "language": "html",
+            "rich_text": [{
+                "type": "text",
+                "text": {"content": "今日更新【EC】12:00 壓 13:00放，有問題請通知我，謝謝"}
+            }]
+        }
+    },
+    {
+        "object": "block",
+        "type": "paragraph",
+        "paragraph": {
+            "rich_text": [{"type": "text", "text": {"content": "訊息內容（不須更新站台可刪除）"}}]
+        }
+    },
+    {
+        "object": "block",
+        "type": "code",
+        "code": {
+            "language": "plain text",
+            "rich_text": [{"type": "text", "text": {"content": ec_summary_text}}]
+        }
+    }
+]
+
+# ✅ 加入 EBS block
+if content_text:
+    blocks.append({
+        "object": "block",
+        "type": "code",
+        "code": {
+            "language": "plain text",
+            "rich_text": [{
+                "type": "text",
+                "text": {
+                    "content": content_text
+                }
+            }]
+        }
+    })
+
 # 寫入「更新佈告」資料庫
 notion.pages.create(
     parent={"database_id": ANNOUNCE_DB_ID},
@@ -94,19 +166,7 @@ notion.pages.create(
             "title": [{"text": {"content": f"{today} 更新佈告"}}]
         }
     },
-    children= [
-        {
-            "object": "block",
-            "type": "code",
-            "code": {
-                "language": "plain text",
-                "rich_text": [{
-                    "type": "text",
-                    "text": {"content": content_text}
-                }]
-            }
-        }
-    ]
+    children=blocks
 )
 
 print("✅ 成功產出更新佈告！")
