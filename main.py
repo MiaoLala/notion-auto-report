@@ -78,7 +78,7 @@ for system_name in systems:
 content_lines = []
 ec_summary_lines = []
 
-# 處理 EBS 系統（保留子分類與順序）
+# 處理 EBS 系統（含子分類）
 if "ＥＢＳ" in grouped:
     content_lines.append("【ＥＢＳ】")
     ebs_data = grouped["ＥＢＳ"]
@@ -92,19 +92,27 @@ if "ＥＢＳ" in grouped:
             content_lines.append(f"{idx}. {item}")
         content_lines.append("")  # 空行隔開
 
-# 處理非 EBS 的特定系統（B2C/B2B/B2E/B2S）
+# 處理 content_lines 的 B2X 系統（固定清單）
 for system in ["Ｂ２Ｃ", "Ｂ２Ｂ", "Ｂ２Ｅ", "Ｂ２Ｓ"]:
-    if system in grouped:
-        system_data = grouped[system]
-        content_lines.append(f"【{system}】")
-        ec_summary_lines.append(f"【{system}】")
+    if system in grouped and "" in grouped[system]:
+        system_items = grouped[system][""]
+        if system_items:
+            content_lines.append(f"【{system}】")
+            for idx, item in enumerate(system_items, 1):
+                content_lines.append(f"{idx}. {item}")
+            content_lines.append("")
 
-        for idx, item in enumerate(system_data, 1):
-            content_lines.append(f"{idx}. {item}")
-            ec_summary_lines.append(f"{idx}. {item}")
-
-        content_lines.append("")
-        ec_summary_lines.append("")
+# 處理 ec_summary_lines：除了ＥＢＳ以外全部列入
+for system, sysdata in grouped.items():
+    if system == "ＥＢＳ":
+        continue  # 跳過 EBS
+    if "" in sysdata:
+        items = sysdata[""]
+        if items:
+            ec_summary_lines.append(f"【{system}】")
+            for idx, item in enumerate(items, 1):
+                ec_summary_lines.append(f"{idx}. {item}")
+            ec_summary_lines.append("")
 
 # Notion content 組成
 content_text = "\n".join(content_lines)
