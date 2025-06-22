@@ -82,6 +82,7 @@ for main in grouped:
     else:  # 非ＥＢＳ系統
         for idx, item in enumerate(grouped[main], 1):
             content_lines.append(f"{idx}. {item}")
+            ec_summary_text_children += f"\n {idx}. {item}"
         content_lines.append("")
 
 content_text = "\n".join(content_lines)
@@ -94,9 +95,11 @@ ec_summary_text = """12:00 壓
 更新說明如下
 --------------------------------------------"""
 
-for system in sorted(non_ebs_grouped.keys()):
-    if non_ebs_grouped[system]:
-        ec_summary_text += f"\n【{system}】"
+# for system in sorted(non_ebs_grouped.keys()):
+#    if non_ebs_grouped[system]:
+#        ec_summary_text += f"\n【{system}】"
+ec_summary_text += ec_summary_text_children
+
 
 # ✅ 組合 blocks 結構
 blocks = [
