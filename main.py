@@ -70,7 +70,8 @@ content_lines = []
 ec_summary_text_children = ""
 for main in grouped:
     content_lines.append(f"【{main}】")
-    ec_summary_text_children += f"\n 【{main}】"
+    if {main} != "ＥＢＳ":
+        ec_summary_text_children += f"\n 【{main}】" # 訊息內容：站台
     if isinstance(grouped[main], dict):  # ＥＢＳ：有子分類
         subs = list(grouped[main].keys())
         ordered = [s for s in EBS_ORDER if s in subs]
@@ -83,7 +84,7 @@ for main in grouped:
     else:  # 非ＥＢＳ系統
         for idx, item in enumerate(grouped[main], 1):
             content_lines.append(f"{idx}. {item}")
-            ec_summary_text_children += f"\n {idx}. {item}"
+            ec_summary_text_children += f"\n {idx}. {item}"　# 訊息內容：項目
         content_lines.append("")
 
 content_text = "\n".join(content_lines)
