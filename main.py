@@ -78,7 +78,7 @@ for system_name in systems:
 content_lines = []
 ec_summary_lines = []
 
-# 處理 EBS 系統（含子分類）
+# 1. 處理 EBS 區塊
 if "ＥＢＳ" in grouped:
     content_lines.append("【ＥＢＳ】")
     ebs_data = grouped["ＥＢＳ"]
@@ -90,41 +90,40 @@ if "ＥＢＳ" in grouped:
         content_lines.append(sub)
         for idx, item in enumerate(ebs_data[sub], 1):
             content_lines.append(f"{idx}. {item}")
-        content_lines.append("")  # 空行隔開
+        content_lines.append("")
 
-# 處理 content_lines 的 B2X 系統（固定清單）
-for system in ["Ｂ２Ｃ", "Ｂ２Ｂ", "Ｂ２Ｅ", "Ｂ２Ｓ"]:
-    if system in grouped and "" in grouped[system]:
-        system_items = grouped[system][""]
-        if system_items:
-            content_lines.append(f"【{system}】")
-            for idx, item in enumerate(system_items, 1):
+# 2. 處理 NON-EBS 區塊
+for sys in NON_EBS_ORDER:
+    if sys in grouped:
+        sys_items_dict = grouped[sys]
+        # 非 EBS，僅會有一層 "" 的 key
+        items = sys_items_dict.get("", [])
+        if not items:
+            continue
+
+        # 對 content_lines：只處理 B2X
+        if sys in ["Ｂ２Ｃ", "Ｂ２Ｂ", "Ｂ２Ｅ", "Ｂ２Ｓ"]:
+            content_lines.append(f"【{sys}】")
+            for idx, item in enumerate(items, 1):
                 content_lines.append(f"{idx}. {item}")
             content_lines.append("")
 
-# 處理 ec_summary_lines：除了ＥＢＳ以外全部列入
-for system, sysdata in grouped.items():
-    if system == "ＥＢＳ":
-        continue  # 跳過 EBS
-    if "" in sysdata:
-        items = sysdata[""]
-        if items:
-            ec_summary_lines.append(f"【{system}】")
-            for idx, item in enumerate(items, 1):
-                ec_summary_lines.append(f"{idx}. {item}")
-            ec_summary_lines.append("")
-
+        # 對 ec_summary_lines：所有 NON_EBS_ORDER 皆處理
+        ec_summary_lines.append(f"【{sys}】")
+        for idx, item in enumerate(items, 1):
+            ec_summary_lines.append(f"{idx}. {item}")
+        ec_summary_lines.append("")
+        
 # Notion content 組成
-content_text = "\n".join(content_lines)
-ec_summary_text_children = "\n".join(ec_summary_lines)
+content_text = "\n".join(content_lines).strip()
+ec_summary_text_children = "\n".join(ec_summary_lines).strip()
 
 # EC summary block 組成
 ec_summary_text = (
     "12:00 壓\n"
     "13:00 放\n\n"
     "更新說明如下\n"
-    "--------------------------------------------\n" +
-    "\n".join(ec_summary_lines)
+    "--------------------------------------------\n" + ec_summary_text_children
 )
 
 # 組合EBS固定文字
