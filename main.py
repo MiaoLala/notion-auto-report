@@ -212,52 +212,52 @@ blocks = [
 
 # ✅ 加入 EBS block
 if content_text:
-    blocks.append(
-    {
-        "object": "block",
-        "type": "heading_2",
-        "heading_2": {
-            "rich_text": [{"type": "text", "text": {"content": "更新佈告"}}]
+    blocks.extend([
+        {
+            "object": "block",
+            "type": "heading_2",
+            "heading_2": {
+                "rich_text": [{"type": "text", "text": {"content": "更新佈告"}}]
+            }
+        },
+        {
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {
+                "rich_text": [{"type": "text", "text": {"content": "標題"}}]
+            }
+        },
+        {
+            "object": "block",
+            "type": "code",
+            "code": {
+                "language": "html",
+                "rich_text": [{
+                    "type": "text",
+                    "text": {"content": "本周各系統程式更新公告"}
+                }]
+            }
+        },
+        {
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {
+                "rich_text": [{"type": "text", "text": {"content": "佈告內容"}}]
+            }
+        },
+        {
+            "object": "block",
+            "type": "code",
+            "code": {
+                "language": "plain text",
+                "rich_text": [{
+                    "type": "text",
+                    "text": {"content": content_text}
+                }]
+            }
         }
-    },
-    {
-        "object": "block",
-        "type": "paragraph",
-        "paragraph": {
-            "rich_text": [{"type": "text", "text": {"content": "標題"}}]
-        }
-    },
-    {
-        "object": "block",
-        "type": "code",
-        "code": {
-            "language": "html",
-            "rich_text": [{
-                "type": "text",
-                "text": {"content": "本周各系統程式更新公告"}
-            }]
-        }
-    },
-    {
-        "object": "block",
-        "type": "paragraph",
-        "paragraph": {
-            "rich_text": [{"type": "text", "text": {"content": "佈告內容"}}]
-        }
-    },
-    {
-        "object": "block",
-        "type": "code",
-        "code": {
-            "language": "plain text",
-            "rich_text": [{
-                "type": "text",
-                "text": {
-                    "content": content_text
-                }
-            }]
-        }
-    })
+    ])
+
 
 # 寫入「更新佈告」資料庫
 notion.pages.create(
