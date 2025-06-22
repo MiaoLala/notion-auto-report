@@ -91,6 +91,7 @@ for main_system, system_data in grouped.items():
             content_lines.append(f"{idx}. {item}")
             ec_summary_lines.append(f"{idx}. {item}")
         content_lines.append("")
+        ec_summary_lines.append("")
 
 # Notion content 組成
 content_text = "\n".join(content_lines)
