@@ -94,7 +94,7 @@ notion.pages.create(
             "title": [{"text": {"content": f"{today} 更新佈告"}}]
         }
     },
-    children: [
+    children= [
         {
             "object": "block",
             "type": "code",
