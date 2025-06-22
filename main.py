@@ -7,8 +7,8 @@ from notion_client import Client
 notion = Client(auth=os.environ["NOTION_TOKEN"])
 
 # 你更新說明的資料庫 ID
-SOURCE_DB_ID = "2182a91a405d80fe82ebc3bf47bfe625" # os.environ["SOURCE_DB_ID"]       # 更新說明的資料庫
-ANNOUNCE_DB_ID = "2192a91a405d80eeaaede0b964e6b751" # os.environ["ANNOUNCE_DB_ID"]   # 要寫入佈告的資料庫
+SOURCE_DB_ID = "2182a91a405d80fe82ebc3bf47bfe625"  # os.environ["SOURCE_DB_ID"]
+ANNOUNCE_DB_ID = "2192a91a405d80eeaaede0b964e6b751"  # os.environ["ANNOUNCE_DB_ID"]
 
 # LINE 設定
 LINE_ACCESS_TOKEN = os.environ["LINE_ACCESS_TOKEN"]
@@ -95,16 +95,18 @@ def create_notion_announcement_page(grouped_systems):
     title = f"{today} 更新佈告"
 
     # --- EC 第一段固定格式 ---
-    non_ebs_grouped = {k: v for k, v in grouped.items() if k != "ＥＢＳ"}
+    non_ebs_grouped = {k: v for k, v in grouped_systems.items() if k != "ＥＢＳ"}
+
     ec_summary_text = """12:00 壓
-    13:00 放
-    
-    更新說明如下
-    --------------------------------------------"""
-    
+13:00 放
+
+更新說明如下
+--------------------------------------------"""
+
     for system in sorted(non_ebs_grouped.keys()):
         if non_ebs_grouped[system]:
             ec_summary_text += f"\n【{system}】"
+
     ec_fixed_blocks = [
         {
             "object": "block",
@@ -148,7 +150,6 @@ def create_notion_announcement_page(grouped_systems):
         }
     ]
 
-
     # --- 第二段：所有系統更新明細 ---
     blocks = []
 
@@ -163,7 +164,7 @@ def create_notion_announcement_page(grouped_systems):
         blocks.append({
             "object": "block",
             "type": "heading_3",
-            "heading_3": {"rich_text": [{"type": "text", "text": {"content": f"【{sys_name}】"}}]}
+            "heading_3": [{"type": "text", "text": {"content": f"【{sys_name}】"}}]
         })
 
         if sys_name == "ＥＢＳ":
@@ -174,7 +175,7 @@ def create_notion_announcement_page(grouped_systems):
                     blocks.append({
                         "object": "block",
                         "type": "paragraph",
-                        "paragraph": {"rich_text": [{"type": "text", "text": {"content": sub_sys}}]}
+                        "paragraph": [{"type": "text", "text": {"content": sub_sys}}]
                     })
                     # 該子分類更新項目（編號）
                     lines = format_update_lines(subsys_dict[sub_sys])
@@ -182,7 +183,7 @@ def create_notion_announcement_page(grouped_systems):
                         blocks.append({
                             "object": "block",
                             "type": "paragraph",
-                            "paragraph": {"rich_text": [{"type": "text", "text": {"content": line}}]}
+                            "paragraph": [{"type": "text", "text": {"content": line}}]
                         })
             # 若還有 EBS 但不在順序列表的子分類也列出
             for sub_sys in subsys_dict:
@@ -190,14 +191,14 @@ def create_notion_announcement_page(grouped_systems):
                     blocks.append({
                         "object": "block",
                         "type": "paragraph",
-                        "paragraph": {"rich_text": [{"type": "text", "text": {"content": sub_sys}}]}
+                        "paragraph": [{"type": "text", "text": {"content": sub_sys}}]
                     })
                     lines = format_update_lines(subsys_dict[sub_sys])
                     for line in lines:
                         blocks.append({
                             "object": "block",
                             "type": "paragraph",
-                            "paragraph": {"rich_text": [{"type": "text", "text": {"content": line}}]}
+                            "paragraph": [{"type": "text", "text": {"content": line}}]
                         })
         else:
             # 其他系統：全部合併（子分類 key 是空字串 ""）
@@ -208,7 +209,7 @@ def create_notion_announcement_page(grouped_systems):
                     blocks.append({
                         "object": "block",
                         "type": "paragraph",
-                        "paragraph": {"rich_text": [{"type": "text", "text": {"content": line}}]}
+                        "paragraph": [{"type": "text", "text": {"content": line}}]
                     })
 
     # 合併所有區塊
@@ -237,7 +238,7 @@ def main():
     grouped = group_items_by_system(items)
     page = create_notion_announcement_page(grouped)
 
-    # 組出要發 LINE 的 EC 訊息（可視需求改）
+    # 你可以根據需求動態產生發送LINE的訊息內容
     ec_line_message = (
         "今日更新【EC】12:00 壓 13:00放，有問題請通知我，謝謝\n\n"
         "12:00 壓\n"
@@ -250,10 +251,8 @@ def main():
         "【B2S】"
     )
 
-    # LINE 發訊息
     send_line_message(LINE_USER_ID, ec_line_message)
 
-    # 印出頁面網址
     print("Notion 佈告頁面網址:", page["url"])
 
 if __name__ == "__main__":
