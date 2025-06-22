@@ -3,6 +3,17 @@ import pytz
 from datetime import datetime
 from notion_client import Client
 
+
+# === Retry 機制 ===
+def with_retry(func, max_attempts=3, delay=5, allowed_exceptions=(Exception,)):
+    for attempt in range(max_attempts):
+        try:
+            return func()
+        except allowed_exceptions as e:
+            print(f"Retry {attempt + 1}/{max_attempts} failed: {e}")
+            time.sleep(delay)
+    raise RuntimeError("Failed after max retries")
+
 # 初始化 Notion API
 notion = Client(auth=os.environ["NOTION_TOKEN"])
 
@@ -287,7 +298,7 @@ if content_text:
 
 
 # 寫入「更新佈告」資料庫
-notion.pages.create(
+with_retry(lambda: notion.pages.create(
     parent={"database_id": ANNOUNCE_DB_ID},
     properties={
         "標題": {
@@ -295,6 +306,6 @@ notion.pages.create(
         }
     },
     children= ebs_blocks + blocks
-)
+))
 
 print("✅ 成功產出更新佈告！")
