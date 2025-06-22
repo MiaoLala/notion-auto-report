@@ -23,6 +23,8 @@ NON_EBS_ORDER = [
     "ＣｏｌａＡＰＩ", "ＷｅｂＡＰＩ", "ＢＢＣ"
 ]
 
+# 限定要整理的系統
+TARGET_SYSTEMS = ["ＥＢＳ", "Ｂ２Ｃ", "Ｂ２Ｂ", "Ｂ２Ｅ", "Ｂ２Ｓ"]
 
 # 設定台灣時間
 tz = pytz.timezone("Asia/Taipei")
@@ -74,42 +76,35 @@ for system_name in systems:
 
 # 組裝公告內容
 content_lines = []
-ec_summary_lines = []  # for EC 訊息內容
+ec_summary_lines = []
 
-# 拆分 EBS 與非 EBS
-ebs_data = {k: v for k, v in grouped.items() if k == "ＥＢＳ"}
-non_ebs_data = {k: v for k, v in grouped.items() if k != "ＥＢＳ"}
+# 處理 EBS 系統（保留子分類與順序）
+if "ＥＢＳ" in grouped:
+    content_lines.append("【ＥＢＳ】")
+    ebs_data = grouped["ＥＢＳ"]
+    subs = list(ebs_data.keys())
+    ordered = [s for s in EBS_ORDER if s in subs]
+    unordered = [s for s in subs if s not in EBS_ORDER]
 
-# 處理 EBS 區塊
-for main_system, system_data in ebs_data.items():
-    content_lines.append(f"【{main_system}】")
+    for sub in ordered + unordered:
+        content_lines.append(sub)
+        for idx, item in enumerate(ebs_data[sub], 1):
+            content_lines.append(f"{idx}. {item}")
+        content_lines.append("")  # 空行隔開
 
-    if isinstance(system_data, dict):  # EBS 有子分類
-        subs = list(system_data.keys())
-        ordered = [s for s in EBS_ORDER if s in subs]
-        unordered = [s for s in subs if s not in EBS_ORDER]
+# 處理非 EBS 的特定系統（B2C/B2B/B2E/B2S）
+for system in ["Ｂ２Ｃ", "Ｂ２Ｂ", "Ｂ２Ｅ", "Ｂ２Ｓ"]:
+    if system in grouped:
+        system_data = grouped[system]
+        content_lines.append(f"【{system}】")
+        ec_summary_lines.append(f"【{system}】")
 
-        for sub in ordered + unordered:
-            content_lines.append(sub)
-            for idx, item in enumerate(system_data[sub], 1):
-                content_lines.append(f"{idx}. {item}")
-            content_lines.append("")  # 空行隔開
+        for idx, item in enumerate(system_data, 1):
+            content_lines.append(f"{idx}. {item}")
+            ec_summary_lines.append(f"{idx}. {item}")
 
-# 處理非 EBS 區塊（先排序）
-sorted_non_ebs_keys = [s for s in NON_EBS_ORDER if s in non_ebs_data] + \
-                      [k for k in non_ebs_data if k not in NON_EBS_ORDER]
-
-for main_system in sorted_non_ebs_keys:
-    system_data = non_ebs_data[main_system]
-    content_lines.append(f"【{main_system}】")
-    ec_summary_lines.append(f"【{main_system}】")
-
-    for idx, item in enumerate(system_data, 1):
-        content_lines.append(f"{idx}. {item}")
-        ec_summary_lines.append(f"{idx}. {item}")
-
-    content_lines.append("")
-    ec_summary_lines.append("")
+        content_lines.append("")
+        ec_summary_lines.append("")
 
 # Notion content 組成
 content_text = "\n".join(content_lines)
