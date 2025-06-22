@@ -141,9 +141,15 @@ if content_text:
         "type": "code",
         "code": {
             "language": "plain text",
-            "rich_text": [{"type": "text", "text": {"content": content_text}}]
+            "rich_text": [{
+                "type": "text",
+                "text": {
+                    "content": content_text
+                }
+            }]
         }
     })
+
 
 # ✅ 建立佈告 page
 new_page = notion.pages.create(
