@@ -70,6 +70,7 @@ content_lines = []
 ec_summary_text_children = ""
 for main in grouped:
     content_lines.append(f"【{main}】")
+    ec_summary_text_children += f"\n 【{main}】"
     if isinstance(grouped[main], dict):  # ＥＢＳ：有子分類
         subs = list(grouped[main].keys())
         ordered = [s for s in EBS_ORDER if s in subs]
