@@ -17,6 +17,13 @@ EBS_ORDER = [
     "國內系統", "入境系統", "包團系統", "人事行政系統", "帳務系統", "客戶系統"
 ]
 
+# 設定非 EBS 分類順序
+NON_EBS_ORDER = [
+    "Ｂ２Ｃ", "Ｂ２Ｂ", "Ｂ２Ｅ", "Ｂ２Ｓ",
+    "ＣｏｌａＡＰＩ", "ＷｅｂＡＰＩ", "ＢＢＣ"
+]
+
+
 # 設定台灣時間
 tz = pytz.timezone("Asia/Taipei")
 today = datetime.now(tz).strftime("%Y-%m-%d")
@@ -69,12 +76,13 @@ for system_name in systems:
 content_lines = []
 ec_summary_lines = []  # for EC 訊息內容
 
-for main_system, system_data in grouped.items():
-    content_lines.append(f"【{main_system}】")
+# 拆分 EBS 與非 EBS
+ebs_data = {k: v for k, v in grouped.items() if k == "ＥＢＳ"}
+non_ebs_data = {k: v for k, v in grouped.items() if k != "ＥＢＳ"}
 
-    # 若非 EBS，記錄系統標題到 EC 區塊
-    if main_system != "ＥＢＳ":
-        ec_summary_lines.append(f"【{main_system}】")
+# 處理 EBS 區塊
+for main_system, system_data in ebs_data.items():
+    content_lines.append(f"【{main_system}】")
 
     if isinstance(system_data, dict):  # EBS 有子分類
         subs = list(system_data.keys())
@@ -86,15 +94,26 @@ for main_system, system_data in grouped.items():
             for idx, item in enumerate(system_data[sub], 1):
                 content_lines.append(f"{idx}. {item}")
             content_lines.append("")  # 空行隔開
-    else:  # 非 EBS 系統
-        for idx, item in enumerate(system_data, 1):
-            content_lines.append(f"{idx}. {item}")
-            ec_summary_lines.append(f"{idx}. {item}")
-        content_lines.append("")
-        ec_summary_lines.append("")
+
+# 處理非 EBS 區塊（先排序）
+sorted_non_ebs_keys = [s for s in NON_EBS_ORDER if s in non_ebs_data] + \
+                      [k for k in non_ebs_data if k not in NON_EBS_ORDER]
+
+for main_system in sorted_non_ebs_keys:
+    system_data = non_ebs_data[main_system]
+    content_lines.append(f"【{main_system}】")
+    ec_summary_lines.append(f"【{main_system}】")
+
+    for idx, item in enumerate(system_data, 1):
+        content_lines.append(f"{idx}. {item}")
+        ec_summary_lines.append(f"{idx}. {item}")
+
+    content_lines.append("")
+    ec_summary_lines.append("")
 
 # Notion content 組成
 content_text = "\n".join(content_lines)
+ec_summary_text_children = "\n".join(ec_summary_lines)
 
 # EC summary block 組成
 ec_summary_text = (
