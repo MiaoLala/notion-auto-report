@@ -12,26 +12,26 @@ ANNOUNCE_DB_ID = "2192a91a405d80eeaaede0b964e6b751"  # os.environ["ANNOUNCE_DB_I
 
 # LINE 設定
 LINE_ACCESS_TOKEN = os.environ["LINE_ACCESS_TOKEN"]
-LINE_USER_ID = "你要發送的用戶ID"
+LINE_USER_IDS = os.environ["LINE_USER_IDS"].split(",")  # 多位用逗號分隔
 
-def send_line_message(user_id, message):
+# ✅ 發送 LINE 訊息函式
+def send_line_message(message):
     url = "https://api.line.me/v2/bot/message/push"
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {LINE_ACCESS_TOKEN}"
     }
-    data = {
-        "to": user_id,
-        "messages": [{
-            "type": "text",
-            "text": message
-        }]
-    }
-    resp = requests.post(url, headers=headers, json=data)
-    if resp.status_code != 200:
-        print(f"LINE 發送失敗：{resp.status_code} {resp.text}")
-    else:
-        print("LINE 發送成功")
+
+    for user_id in LINE_USER_IDS:
+        data = {
+            "to": user_id.strip(),
+            "messages": [{"type": "text", "text": message}]
+        }
+        response = requests.post(url, headers=headers, json=data)
+        if response.status_code != 200:
+            print(f"❌ LINE 發送失敗（{user_id}）：{response.status_code}, {response.text}")
+        else:
+            print(f"✅ 已發送給 {user_id}")
 
 def get_unfinished_items():
     results = []
