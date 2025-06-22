@@ -96,8 +96,13 @@ if "ＥＢＳ" in grouped:
 for sys in NON_EBS_ORDER:
     if sys in grouped:
         sys_items_dict = grouped[sys]
-        # 非 EBS，僅會有一層 "" 的 key
-        items = sys_items_dict.get("", [])
+        
+        # 判斷是 dict（預期格式）還是直接 list（兼容其他來源）
+        if isinstance(sys_items_dict, dict):
+            items = sys_items_dict.get("", [])
+        else:
+            items = sys_items_dict
+        
         if not items:
             continue
 
