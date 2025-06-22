@@ -104,6 +104,68 @@ ec_summary_text = (
     "\n".join(ec_summary_lines)
 )
 
+# 組合EBS固定文字
+
+# EC summary block 組成
+ebs_summary_text = (
+    "12:00 壓\n"
+    "13:00 放\n\n"
+    "更新說明如下\n"
+    "--------------------------------------------\n"
+    "【EBSB】\n\n"
+    "【EBSC】"
+)
+
+ebs_blocks = [
+    {
+        "object": "block",
+        "type": "heading_2",
+        "heading_2": {
+            "rich_text": [{"type": "text", "text": {"content": "訊息發送"}}]
+        }
+    },
+    {
+        "object": "block",
+        "type": "heading_3",
+        "heading_3": {
+            "rich_text": [{"type": "text", "text": {"content": "ＥＢＳ"}}]
+        }
+    },
+    {
+        "object": "block",
+        "type": "paragraph",
+        "paragraph": {
+            "rich_text": [{"type": "text", "text": {"content": "標題"}}]
+        }
+    },
+    {
+        "object": "block",
+        "type": "code",
+        "code": {
+            "language": "html",
+            "rich_text": [{
+                "type": "text",
+                "text": {"content": "今日更新【EBS】12:00 壓 13:00放，有問題請通知我，謝謝"}
+            }]
+        }
+    },
+    {
+        "object": "block",
+        "type": "paragraph",
+        "paragraph": {
+            "rich_text": [{"type": "text", "text": {"content": "訊息內容（請自行查閱A00C004目前在B或C上的程式）"}}]
+        }
+    },
+    {
+        "object": "block",
+        "type": "code",
+        "code": {
+            "language": "plain text",
+            "rich_text": [{"type": "text", "text": {"content": ebs_summary_text}}]
+        }
+    }
+]
+
 # ✅ 組合 blocks 結構
 blocks = [
     {
@@ -150,7 +212,40 @@ blocks = [
 
 # ✅ 加入 EBS block
 if content_text:
-    blocks.append({
+    blocks.append(
+    {
+        "object": "block",
+        "type": "heading_2",
+        "heading_2": {
+            "rich_text": [{"type": "text", "text": {"content": "更新佈告"}}]
+        }
+    },
+    {
+        "object": "block",
+        "type": "paragraph",
+        "paragraph": {
+            "rich_text": [{"type": "text", "text": {"content": "標題"}}]
+        }
+    },
+    {
+        "object": "block",
+        "type": "code",
+        "code": {
+            "language": "html",
+            "rich_text": [{
+                "type": "text",
+                "text": {"content": "本周各系統程式更新公告"}
+            }]
+        }
+    },
+    {
+        "object": "block",
+        "type": "paragraph",
+        "paragraph": {
+            "rich_text": [{"type": "text", "text": {"content": "佈告內容"}}]
+        }
+    },
+    {
         "object": "block",
         "type": "code",
         "code": {
