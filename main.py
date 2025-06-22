@@ -1,9 +1,9 @@
 import os
 import time
 import pytz
+import requests
 from datetime import datetime
 from notion_client import Client
-
 
 # === Retry 機制 ===
 def with_retry(func, max_attempts=3, delay=5, allowed_exceptions=(Exception,)):
@@ -17,6 +17,10 @@ def with_retry(func, max_attempts=3, delay=5, allowed_exceptions=(Exception,)):
 
 # 初始化 Notion API
 notion = Client(auth=os.environ["NOTION_TOKEN"])
+
+# 設定LINE變數
+LINE_ACCESS_TOKEN = os.environ["LINE_ACCESS_TOKEN"]
+LINE_USER_ID = "Ueac062fbefdeffa4bc3a4020db58fff6"
 
 # 設定資料庫 ID
 SOURCE_DB_ID = "2182a91a405d80fe82ebc3bf47bfe625" # os.environ["SOURCE_DB_ID"]       # 更新說明的資料庫
@@ -41,6 +45,24 @@ TARGET_SYSTEMS = ["ＥＢＳ", "Ｂ２Ｃ", "Ｂ２Ｂ", "Ｂ２Ｅ", "Ｂ２Ｓ
 # 設定台灣時間
 tz = pytz.timezone("Asia/Taipei")
 today = datetime.now(tz).strftime("%Y-%m-%d")
+
+# line 發送訊息
+def send_line_message(user_id, message):
+    url = "https://api.line.me/v2/bot/message/push"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {LINE_ACCESS_TOKEN}"
+    }
+    data = {
+        "to": user_id,
+        "messages": [{
+            "type": "text",
+            "text": message
+        }]
+    }
+    response = requests.post(url, headers=headers, json=data)
+    if response.status_code != 200:
+        print(f"LINE 發送失敗：{response.status_code} {response.text}")
 
 # 查詢尚未完成的項目
 response = notion.databases.query(
@@ -299,7 +321,7 @@ if content_text:
 
 
 # 寫入「更新佈告」資料庫
-with_retry(lambda: notion.pages.create(
+new_page = with_retry(lambda: notion.pages.create(
     parent={"database_id": ANNOUNCE_DB_ID},
     properties={
         "標題": {
@@ -309,4 +331,7 @@ with_retry(lambda: notion.pages.create(
     children= ebs_blocks + blocks
 ))
 
-print("✅ 成功產出更新佈告！")
+# print("✅ 成功產出更新佈告！")
+
+# ✅ 發送通知
+send_line_message(f"✅ 已產出更新佈告\n🔗 {new_page['url']}")
