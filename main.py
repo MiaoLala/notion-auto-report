@@ -94,12 +94,16 @@ notion.pages.create(
             "title": [{"text": {"content": f"{today} 更新佈告"}}]
         }
     },
-    children=[
+    children: [
         {
             "object": "block",
-            "type": "paragraph",
-            "paragraph": {
-                "rich_text": [{"type": "text", "text": {"content": content_text}}]
+            "type": "code",
+            "code": {
+                "language": "plain text",
+                "rich_text": [{
+                    "type": "text",
+                    "text": {"content": content_text}
+                }]
             }
         }
     ]
