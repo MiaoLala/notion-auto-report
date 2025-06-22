@@ -106,7 +106,7 @@ ec_summary_text = (
 
 # 組合EBS固定文字
 
-# EC summary block 組成
+# 訊息發送 summary block 組成
 ebs_summary_text = (
     "12:00 壓\n"
     "13:00 放\n\n"
@@ -267,7 +267,7 @@ notion.pages.create(
             "title": [{"text": {"content": f"{today} 更新佈告"}}]
         }
     },
-    children=blocks
+    children= ebs_blocks + blocks
 )
 
 print("✅ 成功產出更新佈告！")
