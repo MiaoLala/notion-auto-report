@@ -67,7 +67,7 @@ for system_name in systems:
 
 # 組裝公告內容
 content_lines = []
-ec_summary_text_children = []
+ec_summary_text_children = ""
 for main in grouped:
     content_lines.append(f"【{main}】")
     if isinstance(grouped[main], dict):  # ＥＢＳ：有子分類
