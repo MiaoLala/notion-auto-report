@@ -4,13 +4,7 @@ import pytz
 import requests
 from datetime import datetime
 from notion_client import Client
-from fastapi import FastAPI
 
-app = FastAPI()
-
-@app.get("/ping")
-def ping():
-    return {"status": "alive"}
 
 # === Retry 機制 ===
 def with_retry(func, max_attempts=3, delay=5, allowed_exceptions=(Exception,)):
