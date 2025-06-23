@@ -70,14 +70,19 @@ for page in meeting_pages:
     # 相關人員（Person）
     persons = props.get("相關人員", {}).get("people", [])
     attendee_names = [p["name"] for p in persons]
+    
+    # 將含有該 user_map 的 key（員編）者視為與會
+    for attendee in attendee_names:
+        for code in user_map.keys():  # 例如 "7701", "1234"
+            if code in attendee:
+                user_meetings[code].append({
+                    "title": title,
+                    "datetime": date_time,
+                    "location": location
+                })
 
-    for name in attendee_names:
-        if name in user_meetings:
-            user_meetings[name].append({
-                "title": title,
-                "datetime": date_time,
-                "location": location
-            })
+print(f"🧾 與會者名稱：{attendee_names}")
+print(f"✅ 有符合的使用者 code：{code}")
 
 # 4️⃣ 傳送 LINE 通知（用 LINE SDK v3）
 print("📨 傳送 LINE 通知中...")
