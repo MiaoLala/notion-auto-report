@@ -1,3 +1,4 @@
 notion-client
 requests
 pytz
+line-bot-sdk
