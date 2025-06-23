@@ -75,11 +75,13 @@ for page in meeting_pages:
     for attendee in attendee_names:
         for code in user_map.keys():  # 例如 "7701", "1234"
             if code in attendee:
-                user_meetings[code].append({
-                    "title": title,
-                    "datetime": date_time,
-                    "location": location
-                })
+                # 加上判斷：只加入今天的
+                if datetime_str[:10] == today_str:
+                    user_meetings[code].append({
+                        "title": title,
+                        "datetime": date_time,
+                        "location": location
+                    })
 
 print(f"🧾 與會者名稱：{attendee_names}")
 print(f"✅ 有符合的使用者 code：{code}")
