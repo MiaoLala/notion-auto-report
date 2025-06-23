@@ -69,13 +69,13 @@ def send_line_message(user_ids, message):
             print(f"❌ LINE 發送失敗 → {user_id}：{response.status_code} {response.text}")
 
 # 查詢尚未完成的項目
-response = notion.databases.query(
-    database_id=SOURCE_DB_ID,
+response = with_retry(lambda: notion.databases.query(
+     database_id=SOURCE_DB_ID,
     filter={
         "property": "完成",
         "checkbox": {"equals": False}
     }
-)
+))
 
 results = response["results"]
 if not results:
@@ -94,7 +94,7 @@ for row in results:
         continue
 
     for rel in relations:
-        system_page = notion.pages.retrieve(rel["id"])
+        system_page = with_retry(lambda: notion.pages.retrieve(rel["id"]))
         system_name = system_page["properties"]["系統名稱"]["title"][0]["plain_text"]
         systems.setdefault(system_name, []).append(title)
 
