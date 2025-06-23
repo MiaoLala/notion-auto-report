@@ -95,7 +95,7 @@ for row in results:
 
     for rel in relations:
         system_page = notion.pages.retrieve(rel["id"])
-        system_name = system_page["properties"]["名稱"]["title"][0]["plain_text"]
+        system_name = system_page["properties"]["系統名稱"]["title"][0]["plain_text"]
         systems.setdefault(system_name, []).append(title)
 
 # 分類為 EBS 與非 EBS 系統
