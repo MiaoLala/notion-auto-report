@@ -330,6 +330,11 @@ new_page = with_retry(lambda: notion.pages.create(
     properties={
         "標題": {
             "title": [{"text": {"content": f"{today} 更新佈告"}}]
+        },
+        "時間":{
+            "date": {
+                "start": datetime.now().strftime("%Y-%m-%d")
+            }
         }
     },
     children= ebs_blocks + blocks,
