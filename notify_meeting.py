@@ -19,13 +19,27 @@ print("🔍 查詢今天的會議...")
 meeting_pages = notion.databases.query(
     database_id=MEETING_DB_ID,
     filter={
-        "property": "日期",
-        "date": {
-            "on_or_after": today_str,
-            "on_or_before": today_str
+        "and": [
+        {
+            "property": "日期",
+            "date": {
+                "on_or_after": today_str,
+                "on_or_before": today_str
+            }
+        },
+        {
+            "property": "類別",
+            "select": {
+                "equals": "會議"
+            }
         }
+    ]
     }
 ).get("results", [])
+
+for page in meeting_pages:
+    print("會議名稱:", page["properties"]["Name"]["title"][0]["text"]["content"])
+    print("日期欄位:", page["properties"]["日期"]["date"]["start"])
 
 if not meeting_pages:
     print("✅ 今天沒有會議")
