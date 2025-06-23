@@ -1,4 +1,4 @@
-name: Daily Meeting Notifier
+name: 每日會議提醒排程
 
 on:
   schedule:
