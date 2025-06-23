@@ -1,14 +1,12 @@
 import os
 from datetime import datetime
 from notion_client import Client
-from linebot.v3.messaging import Configuration, MessagingApi
+from linebot.v3.messaging import Configuration, ApiClient, MessagingApi
 from linebot.v3.messaging.models import TextMessage, PushMessageRequest
 
-# 初始化 Notion 與 LINE Messaging API
+# 初始化 Notion 與 LINE SDK
 notion = Client(auth=os.getenv("NOTION_TOKEN"))
-
 line_config = Configuration(access_token=os.getenv("LINE_ACCESS_TOKEN"))
-line_bot_api = MessagingApi(configuration=line_config)
 
 MEETING_DB_ID = "cd784a100f784e15b401155bc3313a1f" # 會議database
 USERID_DB_ID = "21bd8d0b09f180908e1df38429153325" # userid database
@@ -33,7 +31,7 @@ if not meeting_pages:
     print("✅ 今天沒有會議")
     exit(0)
 
-# 2️⃣ 讀取使用者對照資料（Name → userId）
+# 2️⃣ 讀取使用者對照表（Name -> userId）
 print("🔍 查詢使用者資料...")
 user_map = {}
 user_meetings = {}
@@ -52,7 +50,7 @@ for page in user_pages:
     user_map[name] = user_id
     user_meetings[name] = []
 
-# 3️⃣ 根據「相關人員（Person）」比對使用者是否有參與會議
+# 3️⃣ 處理每一場會議，分類給每位與會者
 for page in meeting_pages:
     props = page["properties"]
     title = props["Name"]["title"][0]["text"]["content"] if props["Name"]["title"] else "未命名會議"
@@ -61,13 +59,15 @@ for page in meeting_pages:
     datetime_str = props["日期"]["date"]["start"]
     date_time = datetime.fromisoformat(datetime_str).strftime("%Y/%m/%d %H:%M")
 
-    # 地點安全擷取
-    location = "未填寫"
+    # 地點（Select）
+    # 地點欄位安全擷取
     location_prop = props.get("地點")
     if location_prop and location_prop.get("select"):
         location = location_prop["select"]["name"]
+    else:
+        location = "未填寫"
 
-    # 相關人員（person）
+    # 相關人員（Person）
     persons = props.get("相關人員", {}).get("people", [])
     attendee_names = [p["name"] for p in persons]
 
@@ -79,32 +79,35 @@ for page in meeting_pages:
                 "location": location
             })
 
-# 4️⃣ 傳送 LINE 通知
+# 4️⃣ 傳送 LINE 通知（用 LINE SDK v3）
 print("📨 傳送 LINE 通知中...")
-for name, meetings in user_meetings.items():
-    if not meetings:
-        continue
+with ApiClient(line_config) as api_client:
+    line_bot_api = MessagingApi(api_client)
 
-    user_id = user_map.get(name)
-    if not user_id:
-        print(f"⚠️ 找不到 {name} 的 LINE userId，略過")
-        continue
+    for name, meetings in user_meetings.items():
+        if not meetings:
+            continue
 
-    lines = [f"{today_display} 會議提醒"]
-    for idx, m in enumerate(meetings, start=1):
-        lines.append(f"{idx}. {m['title']}")
-        lines.append(f"－ 時間：{m['datetime']}")
-        lines.append(f"－ 地點：{m['location']}")
-        lines.append("")
+        user_id = user_map.get(name)
+        if not user_id:
+            print(f"⚠️ 找不到 {name} 的 LINE userId，略過")
+            continue
 
-    message_text = "\n".join(lines).strip()
+        lines = [f"{today_display} 會議提醒"]
+        for idx, m in enumerate(meetings, start=1):
+            lines.append(f"{idx}. {m['title']}")
+            lines.append(f"－ 時間：{m['datetime']}")
+            lines.append(f"－ 地點：{m['location']}")
+            lines.append("")
 
-    try:
-        request = PushMessageRequest(
-            to=user_id,
-            messages=[TextMessage(text=message_text)]
-        )
-        line_bot_api.push_message(request)
-        print(f"✅ 已通知 {name}")
-    except Exception as e:
-        print(f"❌ 發送給 {name}（{user_id}）失敗：{e}")
+        message_text = "\n".join(lines).strip()
+
+        try:
+            request = PushMessageRequest(
+                to=user_id,
+                messages=[TextMessage(text=message_text)]
+            )
+            line_bot_api.push_message(request)
+            print(f"✅ 已通知 {name}")
+        except Exception as e:
+            print(f"❌ 發送給 {name}（{user_id}）失敗：{e}")
