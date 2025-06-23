@@ -25,8 +25,8 @@ LINE_USER_IDS = [
     # 依需要可再增加
 ]
 # 設定資料庫 ID
-SOURCE_DB_ID = "2182a91a405d80fe82ebc3bf47bfe625" # os.environ["SOURCE_DB_ID"]       # 更新說明的資料庫
-ANNOUNCE_DB_ID = "2192a91a405d80eeaaede0b964e6b751" # os.environ["ANNOUNCE_DB_ID"]   # 要寫入佈告的資料庫
+SOURCE_DB_ID = "211d8d0b09f1809fb9aee315fd27fc8e" # os.environ["SOURCE_DB_ID"]       # 更新說明的資料庫
+ANNOUNCE_DB_ID = "211d8d0b09f18048bfa1dfae66ded144" # os.environ["ANNOUNCE_DB_ID"]   # 要寫入佈告的資料庫
 
 # 設定 EBS 子分類順序
 EBS_ORDER = [
@@ -38,7 +38,7 @@ EBS_ORDER = [
 # 設定非 EBS 分類順序
 NON_EBS_ORDER = [
     "Ｂ２Ｃ", "Ｂ２Ｂ", "Ｂ２Ｅ", "Ｂ２Ｓ",
-    "ＣｏｌａＡＰＩ", "ＷｅｂＡＰＩ", "ＢＢＣ"
+    "ＣｏｌａＡＰＩ", "ＷｅｂＡＰＩ", "前端", "ＢＢＣ"
 ]
 
 # 限定要整理的系統
