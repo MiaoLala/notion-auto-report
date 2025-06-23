@@ -332,7 +332,11 @@ new_page = with_retry(lambda: notion.pages.create(
             "title": [{"text": {"content": f"{today} 更新佈告"}}]
         }
     },
-    children= ebs_blocks + blocks
+    children= ebs_blocks + blocks,
+    icon={
+        "type": "emoji",
+        "emoji": "⭐"
+    }
 ))
 
 # print("✅ 成功產出更新佈告！")
