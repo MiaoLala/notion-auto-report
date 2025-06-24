@@ -166,7 +166,7 @@ for sys in NON_EBS_ORDER:
         
 # Notion content 組成
 content_text = "\n".join(content_lines).strip()
-content_text += "\n****** 如欲了解更新詳細內容，請聯絡需求窗口 ******"
+content_text += "\n\n\n****** 如欲了解更新詳細內容，請聯絡需求窗口 ******"
 ec_summary_text_children = "\n".join(ec_summary_lines).strip()
 
 # EC summary block 組成
