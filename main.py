@@ -327,6 +327,13 @@ if content_text:
                     "text": {"content": content_text}
                 }]
             }
+        },
+        {
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {
+                "rich_text": [{"type": "text", "text": {"content": "****** 如欲了解更新詳細內容，請聯絡需求窗口 ******"}}]
+            }
         }
     ])
 
