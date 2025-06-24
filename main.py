@@ -355,4 +355,4 @@ new_page = with_retry(lambda: notion.pages.create(
 # print("✅ 成功產出更新佈告！")
 
 # ✅ 發送通知
-send_line_message(LINE_USER_IDS, f"✅ 已產出更新佈告\n🔗 {new_page['url']}")
+# send_line_message(LINE_USER_IDS, f"✅ 已產出更新佈告\n🔗 {new_page['url']}")
