@@ -69,6 +69,32 @@ def send_line_message(user_ids, message):
         if response.status_code != 200:
             print(f"❌ LINE 發送失敗 → {user_id}：{response.status_code} {response.text}")
 
+def get_today_announcement_title():
+    today = datetime.now().strftime("%Y/%m/%d")
+    return f"{today} 更新佈告"
+
+def has_today_announcement():
+    today_title = get_today_announcement_title()
+    
+    response = notion.databases.query(
+        database_id=ANNOUNCE_DB_ID,
+        filter={
+            "property": "標題",
+            "title": {
+                "equals": today_title
+            }
+        }
+    )
+    return len(response["results"]) > 0
+
+
+# ✅ 防重送判斷（直接執行）
+if has_today_announcement():
+    print("✅ 今日已產生過更新佈告，流程中止")
+    exit(0)
+
+print("🚀 尚未產生，準備建立新佈告...")
+
 # 查詢尚未完成的項目
 response = with_retry(lambda: notion.databases.query(
      database_id=SOURCE_DB_ID,
@@ -356,3 +382,6 @@ new_page = with_retry(lambda: notion.pages.create(
 
 # ✅ 發送通知
 # send_line_message(LINE_USER_IDS, f"✅ 已產出更新佈告\n🔗 {new_page['url']}")
+
+if __name__ == "__main__":
+    main()
