@@ -75,7 +75,13 @@ response = with_retry(lambda: notion.databases.query(
     filter={
         "property": "完成",
         "checkbox": {"equals": False}
-    }
+    },
+    sorts=[
+        {
+            "property": "更新日期",  # 你在 Notion database 裡的欄位名稱（類型需為日期或時間戳）
+            "direction": "ascending"  # 正序排列，可用 "descending" 表示反序
+        }
+    ]
 ))
 
 results = response["results"]
