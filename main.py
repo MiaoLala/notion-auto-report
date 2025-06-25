@@ -119,22 +119,6 @@ def has_today_announcement():
 
 log_to_notion_title("⚠️ 佈告產生中，請耐心等待．．．")
 
-# ✅ 加入防重送與「非週二不執行」邏輯
-if now.weekday() != 1:
-    print("⛔ 今天不是週二，不執行更新佈告產出流程。")
-    log_to_notion_title("⛔ 今天不是週二，不執行更新佈告產出流程。")
-    if os.environ.get("GITHUB_ACTIONS") == "true":
-        time.sleep(65)
-    exit(0)
-
-# ✅ 防重送判斷（直接執行）
-if has_today_announcement():
-    print("⛔ 今日已產生過更新佈告，流程中止")
-    log_to_notion_title("⛔ 今日已產生過更新佈告，流程中止")
-    if os.environ.get("GITHUB_ACTIONS") == "true":
-        time.sleep(65)
-    exit(0)
-
 print("🚀 尚未產生，準備建立新佈告...")
 
 # 查詢尚未完成的項目
