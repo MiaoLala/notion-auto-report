@@ -2,4 +2,3 @@ notion-client
 requests
 pytz
 line-bot-sdk>=3.0.0
-threading
