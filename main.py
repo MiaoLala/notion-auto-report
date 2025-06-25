@@ -68,7 +68,7 @@ def log_to_notion_title(text: str):
 
     # 啟動一個 background thread，1 分鐘後清空 title
     def clear_title():
-        time.sleep(30)
+        time.sleep(10)
         notion.pages.update(
             page_id=NOTION_LOG_PAGE_ID,
             properties={
@@ -428,7 +428,7 @@ new_page = with_retry(lambda: notion.pages.create(
 print("✅ 成功產出更新佈告！")
 log_to_notion_title("✅ 成功產出更新佈告！")
 if os.environ.get("GITHUB_ACTIONS") == "true":
-    time.sleep(65)
+    time.sleep(20)
 
 # ✅ 發送通知
 # send_line_message(LINE_USER_IDS, f"✅ 已產出更新佈告\n🔗 {new_page['url']}")
