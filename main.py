@@ -4,7 +4,7 @@ import pytz
 import requests
 from datetime import datetime
 from notion_client import Client
-
+import threading
 
 # === Retry 機制 ===
 def with_retry(func, max_attempts=3, delay=5, allowed_exceptions=(Exception,)):
@@ -28,6 +28,7 @@ LINE_USER_IDS = [
 # 設定資料庫 ID
 SOURCE_DB_ID = "211d8d0b09f1809fb9aee315fd27fc8e" # os.environ["SOURCE_DB_ID"]       # 更新說明的資料庫
 ANNOUNCE_DB_ID = "211d8d0b09f18048bfa1dfae66ded144" # os.environ["ANNOUNCE_DB_ID"]   # 要寫入佈告的資料庫
+NOTION_LOG_PAGE_ID = "21dd8d0b09f180f2a909eb135c627f9b"  # LOG Page ID
 
 # 設定 EBS 子分類順序
 EBS_ORDER = [
@@ -50,6 +51,34 @@ tz = pytz.timezone("Asia/Taipei")
 now = datetime.now(tz)
 today = datetime.now(tz).strftime("%Y/%m/%d")
 
+
+def log_to_notion_title(text: str):
+    print(text)  # 保留原本 console print
+    # 寫入 Notion page 的 title
+    notion.pages.update(
+        page_id=NOTION_LOG_PAGE_ID,
+        properties={
+            "標題": {
+                "title": [{
+                    "text": {"content": text[:200]}  # Notion title 長度限制
+                }]
+            }
+        }
+    )
+
+    # 啟動一個 background thread，1 分鐘後清空 title
+    def clear_title():
+        time.sleep(60)
+        notion.pages.update(
+            page_id=NOTION_LOG_PAGE_ID,
+            properties={
+                "標題": {
+                    "title": []
+                }
+            }
+        )
+    threading.Thread(target=clear_title, daemon=True).start()
+    
 # line 發送訊息
 
 def send_line_message(user_ids, message):
@@ -87,15 +116,19 @@ def has_today_announcement():
         }
     )
     return len(response["results"]) > 0
-    
+
+log_to_notion_title("⚠️ 佈告產生中，請耐心等待．．．")
+
 # ✅ 加入防重送與「非週二不執行」邏輯
 if now.weekday() != 1:
     print("⛔ 今天不是週二，不執行更新佈告產出流程。")
+    log_to_notion_title("⛔ 今天不是週二，不執行更新佈告產出流程。")
     exit(0)
 
 # ✅ 防重送判斷（直接執行）
 if has_today_announcement():
-    print("✅ 今日已產生過更新佈告，流程中止")
+    print("⛔ 今日已產生過更新佈告，流程中止")
+    log_to_notion_title("⛔ 今日已產生過更新佈告，流程中止")
     exit(0)
 
 print("🚀 尚未產生，準備建立新佈告...")
@@ -117,7 +150,8 @@ response = with_retry(lambda: notion.databases.query(
 
 results = response["results"]
 if not results:
-    print("✅ 沒有未完成項目，不需新增佈告。")
+    print("⛔ 沒有更新說明項目，不需新增佈告。")
+    log_to_notion_title("⛔ 沒有更新說明項目，不需新增佈告。")
     exit(0)
 
 # 整理資料
@@ -383,7 +417,8 @@ new_page = with_retry(lambda: notion.pages.create(
     }
 ))
 
-# print("✅ 成功產出更新佈告！")
+print("✅ 成功產出更新佈告！")
+log_to_notion_title("✅ 成功產出更新佈告！")
 
 # ✅ 發送通知
 # send_line_message(LINE_USER_IDS, f"✅ 已產出更新佈告\n🔗 {new_page['url']}")
