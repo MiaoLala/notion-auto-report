@@ -47,6 +47,7 @@ TARGET_SYSTEMS = ["ＥＢＳ", "Ｂ２Ｃ", "Ｂ２Ｂ", "Ｂ２Ｅ", "Ｂ２Ｓ
 
 # 設定台灣時間
 tz = pytz.timezone("Asia/Taipei")
+now = datetime.now(tz)
 today = datetime.now(tz).strftime("%Y/%m/%d")
 
 # line 發送訊息
