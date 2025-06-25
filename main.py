@@ -86,7 +86,11 @@ def has_today_announcement():
         }
     )
     return len(response["results"]) > 0
-
+    
+# ✅ 加入防重送與「非週二不執行」邏輯
+if now.weekday() != 1:
+    print("⛔ 今天不是週二，不執行更新佈告產出流程。")
+    exit(0)
 
 # ✅ 防重送判斷（直接執行）
 if has_today_announcement():
