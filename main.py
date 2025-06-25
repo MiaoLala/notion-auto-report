@@ -123,12 +123,16 @@ log_to_notion_title("⚠️ 佈告產生中，請耐心等待．．．")
 if now.weekday() != 1:
     print("⛔ 今天不是週二，不執行更新佈告產出流程。")
     log_to_notion_title("⛔ 今天不是週二，不執行更新佈告產出流程。")
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        time.sleep(65)
     exit(0)
 
 # ✅ 防重送判斷（直接執行）
 if has_today_announcement():
     print("⛔ 今日已產生過更新佈告，流程中止")
     log_to_notion_title("⛔ 今日已產生過更新佈告，流程中止")
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        time.sleep(65)
     exit(0)
 
 print("🚀 尚未產生，準備建立新佈告...")
@@ -152,6 +156,8 @@ results = response["results"]
 if not results:
     print("⛔ 沒有更新說明項目，不需新增佈告。")
     log_to_notion_title("⛔ 沒有更新說明項目，不需新增佈告。")
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        time.sleep(65)
     exit(0)
 
 # 整理資料
@@ -419,6 +425,8 @@ new_page = with_retry(lambda: notion.pages.create(
 
 print("✅ 成功產出更新佈告！")
 log_to_notion_title("✅ 成功產出更新佈告！")
+if os.environ.get("GITHUB_ACTIONS") == "true":
+    time.sleep(65)
 
 # ✅ 發送通知
 # send_line_message(LINE_USER_IDS, f"✅ 已產出更新佈告\n🔗 {new_page['url']}")
