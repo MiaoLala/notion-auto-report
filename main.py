@@ -433,5 +433,3 @@ if os.environ.get("GITHUB_ACTIONS") == "true":
 # ✅ 發送通知
 # send_line_message(LINE_USER_IDS, f"✅ 已產出更新佈告\n🔗 {new_page['url']}")
 
-if __name__ == "__main__":
-    main()
