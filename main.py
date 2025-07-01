@@ -183,14 +183,14 @@ grouped = {}
 
 for system_name in systems:
     if "－" in system_name:
-        main, sub = system_name.split("－", 1)
+        main_name, sub = system_name.split("－", 1)
     else:
-        main, sub = system_name, None
+        main_name, sub = system_name, None
 
-    if main == "ＥＢＳ":
-        grouped.setdefault(main, {}).setdefault(sub, []).extend(systems[system_name])
+    if main_name == "ＥＢＳ":
+        grouped.setdefault(main_name, {}).setdefault(sub, []).extend(systems[system_name])
     else:
-        grouped.setdefault(main, []).extend(systems[system_name])
+        grouped.setdefault(main_name, []).extend(systems[system_name])
 
 # 組裝公告內容
 content_lines = []
