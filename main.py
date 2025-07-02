@@ -356,9 +356,39 @@ blocks = [
     }
 ]
 
+callout_text = """佈告發送說明：
+1. 主題類別：資訊─程式功能更新
+2. 張貼天數：7天
+3. 佈告欄：可樂佈告欄
+4. 主旨：本周各系統程式更新公告
+5. 「勾」重要公告，「不勾」允許列印
+6. 張貼內容請用文字標題區分各網站，例如【ＥＢＳ】【Ｂ２Ｃ】...，各系統文字請用"藍色"表示
+7. 文末請將下方文字改為紅字
+****** 如欲了解更新詳細內容，請聯絡需求窗口 ******
+8. 請將需求窗口連結到user（請善用編輯器功能）
+"""
+
 # ✅ 加入 EBS block
 if content_text:
     blocks.extend([
+        {
+            "object": "block",
+            "type": "callout",
+            "callout": {
+                "icon": {
+                    "type": "emoji",
+                    "emoji": "📢"
+                },
+                "rich_text": [
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": callout_text
+                        }
+                    }
+                ]
+            }
+        },
         {
             "object": "block",
             "type": "heading_2",
