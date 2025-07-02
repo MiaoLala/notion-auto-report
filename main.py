@@ -367,12 +367,18 @@ callout_text = """佈告發送說明：
 6. 張貼內容請用文字標題區分各網站，例如【ＥＢＳ】【Ｂ２Ｃ】...，各系統文字請用"藍色"表示
 7. 文末請將下方文字改為紅字
 ****** 如欲了解更新詳細內容，請聯絡需求窗口 ******
-8. 請將需求窗口連結到user（請善用編輯器功能）
-"""
+8. 請將需求窗口連結到user（請善用編輯器功能）"""
 
 # ✅ 加入 EBS block
 if content_text:
     blocks.extend([
+        {
+            "object": "block",
+            "type": "heading_2",
+            "heading_2": {
+                "rich_text": [{"type": "text", "text": {"content": "更新佈告"}}]
+            }
+        },
         {
             "object": "block",
             "type": "callout",
@@ -389,13 +395,6 @@ if content_text:
                         }
                     }
                 ]
-            }
-        },
-        {
-            "object": "block",
-            "type": "heading_2",
-            "heading_2": {
-                "rich_text": [{"type": "text", "text": {"content": "更新佈告"}}]
             }
         },
         {
