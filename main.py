@@ -119,13 +119,15 @@ def has_today_announcement():
     )
     return len(response["results"]) > 0
 
-# ✅ 加入防重送與「非週二不執行」邏輯
-if now.weekday() != 1:
-    print("⛔ 今天不是週二，不執行更新佈告產出流程。")
-    log_to_notion_title("⛔ 今天不是週二，不執行更新佈告產出流程。")
-    if os.environ.get("GITHUB_ACTIONS") == "true":
-        time.sleep(65)
-    exit(0)
+# 從github手動執行不走此判斷
+if os.getenv("GITHUB_ACTIONS") != "true":
+    # ✅ 加入防重送與「非週二不執行」邏輯
+    if now.weekday() != 1:
+        print("⛔ 今天不是週二，不執行更新佈告產出流程。")
+        log_to_notion_title("⛔ 今天不是週二，不執行更新佈告產出流程。")
+        if os.environ.get("GITHUB_ACTIONS") == "true":
+            time.sleep(65)
+        exit(0)
 
 # ✅ 防重送判斷（直接執行）
 if has_today_announcement():
